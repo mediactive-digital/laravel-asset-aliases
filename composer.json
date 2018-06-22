@@ -1,0 +1,39 @@
+{
+    "name": "mediactive-digital/laravel-asset-aliases",
+    "type": "package",
+    "description": "Link CSS / JS files in Laravel Blade templates",
+    "keywords": [
+		"laravel",
+		"css",
+		"javascript",
+		"php",
+		"blade",
+		"template",
+		"composer",
+		"package"
+	],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Mediactive Digital"
+        }
+    ],
+	"autoload": {
+		"psr-4": {
+			"MediactiveDigital\\LaravelAssetAliases\\": "src/"
+		}
+	},
+	"extra": {
+		"laravel": {
+			"providers": [
+				"MediactiveDigital\\LaravelAssetAliases\\LaravelAssetAliasesServiceProvider"
+			],
+			"aliases": {
+				"MDAsset": "MediactiveDigital\\LaravelAssetAliases\\LaravelAssetAliasesFacade"
+			}
+		},
+		"branch-alias": {
+			"dev-master": "0.1-dev"
+		}
+	}
+}
