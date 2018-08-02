@@ -18,7 +18,7 @@ class AssetManager {
      */
     protected static function generateTag($files, $type): string
     {
-        $files = is_array($files) ? $files : [$files];
+        $files = (array)$files;
         $result = '';
 
         $startTag = $type == self::CSS ? '<link rel="stylesheet" type="text/css" href="' : '<script type="text/javascript" src="';
@@ -26,9 +26,12 @@ class AssetManager {
 
         foreach ($files as $file) {
 
+            $sri = '';
+
             if (!filter_var($file, FILTER_VALIDATE_URL)) {
 
-                $fileAlias = Config::get('laravel-asset-aliases.alias.'.$type.'.'.$file);
+                $values = (array)Config::get('laravel-asset-aliases.alias.'.$type.'.'.$file);
+                $fileAlias = isset($values[0]) ? $values[0] : '';
                 $isUrl = $fileAlias ? filter_var($fileAlias, FILTER_VALIDATE_URL) : false;
                 $file = $fileAlias ? $fileAlias : $file;
 
@@ -39,12 +42,16 @@ class AssetManager {
                     $timeStamp = File::exists($filePath) ? File::lastModified($filePath) : false;
                     $file = asset($fileAlias).($timeStamp ? '?time='.$timeStamp : '');
                 }
+                else if (isset($values[1]) && $values[1]) {
+
+                    $sri = '" integrity="'.$values[1].'" crossorigin="'.(isset($values[2]) && $values[2] ? 'use-credentials' : 'anonymous');
+                }
             }
 
-            $result .= $startTag.$file.$endTag."\r\n";
+            $result .= $startTag.$file.$sri.$endTag."\r\n";
         }
 
-        return rtrim($result,"\r\n");
+        return $result ? rtrim($result, "\r\n") : $result;
     }
 
     /**

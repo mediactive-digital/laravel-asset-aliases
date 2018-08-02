@@ -32,7 +32,7 @@ Add the AssetManager facade to /config/app.php file.
 
 ## Usage
 
-You can link either an internal ressource or an external URL.
+You can link either an internal resource or an external URL.
 
 #### Link CSS files.
 
@@ -82,4 +82,41 @@ Then link files by aliases, for example :
 
 ```
 	{!! MDAsset::addCss('stylesheet') !!}
+```
+
+#### Support for SRI relative to resources loaded from CDN.
+
+Instead of passing an external URL only, you can pass an array of values for SRI support.\
+Three parameters are taken into account :
+
+1. External URL.
+2. Subresource integrity hash key.
+3. Cross-origin resource sharing setting ("use-credentials" if true, "anonymous" if false or unspecified).
+
+```php
+// Example
+return [
+	'css' => [
+		'stylesheet' => [
+			'https://cdn.com/stylesheet.css',
+			'hashKey'
+		],
+		'other-stylesheet' => [
+			'https://other-cdn.com/stylesheet.css',
+			'hashKey',
+			true
+		]
+	],
+	'js' => [
+		'script' => [
+			'https://cdn.com/script.js',
+			'hashKey'
+		],
+		'other-script' => [
+			'https://other-cdn.com/script.js',
+			'hashKey',
+			true
+		]
+	]
+];
 ```
