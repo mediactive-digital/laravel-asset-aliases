@@ -18,20 +18,24 @@ class AssetManager {
      */
     protected static function generateTag($files, $type): string
     {
-        $files = (array)$files;
         $result = '';
+        $files = isset($files['file']) ? [$files] : (array)$files;
 
-        $startTag = $type == self::CSS ? '<link rel="stylesheet" type="text/css" href="' : '<script type="text/javascript" src="';
-        $endTag = $type == self::CSS ? '">' : '"></script>';
+        $startTag = $type == self::CSS ? '<link href="' : '<script src="';
+        $endTag = $type == self::CSS ? '>' : '></script>';
+        $defaultAttributes = $type == self::CSS ? ['rel' => 'stylesheet', 'type' => 'text/css'] : ['type' => 'text/javascript'];
 
-        foreach ($files as $file) {
+        foreach ($files as $fileValue) {
 
-            $sri = '';
+            $attributes = '"';
+            $fileValue = (array)$fileValue;
+            $file = isset($fileValue[0]) ? $fileValue[0] : (isset($fileValue['file']) ? $fileValue['file'] : '');
+            $attributesArray = isset($fileValue['attributes']) ? (array)$fileValue['attributes'] : [];
 
             if (!filter_var($file, FILTER_VALIDATE_URL)) {
 
                 $values = (array)Config::get('laravel-asset-aliases.alias.'.$type.'.'.$file);
-                $fileAlias = isset($values[0]) ? $values[0] : '';
+                $fileAlias = isset($values[0]) ? $values[0] : (isset($values['file']) ? $values['file'] : '');
                 $isUrl = $fileAlias ? filter_var($fileAlias, FILTER_VALIDATE_URL) : false;
                 $file = $fileAlias ? $fileAlias : $file;
 
@@ -42,13 +46,18 @@ class AssetManager {
                     $timeStamp = File::exists($filePath) ? File::lastModified($filePath) : false;
                     $file = asset($fileAlias).($timeStamp ? '?time='.$timeStamp : '');
                 }
-                else if (isset($values[1]) && $values[1]) {
 
-                    $sri = '" integrity="'.$values[1].'" crossorigin="'.(isset($values[2]) && $values[2] ? 'use-credentials' : 'anonymous');
-                }
+                $attributesArray += isset($values['attributes']) ? (array)$values['attributes'] : [];
             }
 
-            $result .= $startTag.$file.$sri.$endTag."\r\n";
+            $attributesArray += $defaultAttributes;
+
+            foreach ($attributesArray as $attribute => $value) {
+
+                $attributes .= ' '.$attribute.($value !== null ? '="'.$value.'"' : '');
+            }
+
+            $result .= $startTag.$file.$attributes.$endTag."\r\n";
         }
 
         return $result ? rtrim($result, "\r\n") : $result;

@@ -45,7 +45,7 @@ simple file
 or array of files
 
 ```
-	{!! MDAsset::addCss(['stylesheet.css','stylesheet2.css']) !!}
+	{!! MDAsset::addCss(['stylesheet.css', 'stylesheet2.css']) !!}
 ```
 
 #### Link JS files.
@@ -59,7 +59,7 @@ simple file
 or array of files
 
 ```
-	{!! MDAsset::addJs(['script.js','script2.js']) !!}
+	{!! MDAsset::addJs(['script.js', 'script2.js']) !!}
 ```
 
 #### Link CSS / JS files by aliases.
@@ -84,39 +84,82 @@ Then link files by aliases, for example :
 	{!! MDAsset::addCss('stylesheet') !!}
 ```
 
-#### Support for SRI relative to resources loaded from CDN.
+#### Support for HTML attributes.
 
-Instead of passing an external URL only, you can pass an array of values for SRI support.\
-Three parameters are taken into account :
+You can pass any number of HTML attributes along with your file definition.\
+It can be done both in configuration file and / or Blade templates.\
+Attributes defined in Blade templates override configuration ones.
 
-1. External URL.
-2. Subresource integrity hash key.
-3. Cross-origin resource sharing setting ("use-credentials" if true, "anonymous" if false or unspecified).
+If you do so, you must use an associative array with the mandatory keys "file" and "attributes".\
+"file" being your file (string) and "attributes" being your HTML attribute(s) (array).
 
 ```php
-// Example
+// Examples
+
+// Inside configuration file : 
 return [
 	'css' => [
 		'stylesheet' => [
-			'https://cdn.com/stylesheet.css',
-			'hashKey'
+			'file' => 'stylesheet.css',
+			'attributes' => [
+				'media' => 'print',
+				'title' => 'title'
+			]
 		],
 		'other-stylesheet' => [
-			'https://other-cdn.com/stylesheet.css',
-			'hashKey',
-			true
+			'file' => 'other-stylesheet.css',
+			'attributes' => [
+				'media' => 'screen'
+			]
 		]
 	],
 	'js' => [
 		'script' => [
-			'https://cdn.com/script.js',
-			'hashKey'
+			'file' => 'script.js',
+			'attributes' => [
+				'integrity' => 'sha384-rAnDoMkeY',
+        		'crossorigin' => 'anonymous'
+			]
 		],
 		'other-script' => [
-			'https://other-cdn.com/script.js',
-			'hashKey',
-			true
+			'file' => 'other-script.js',
+			'attributes' => [
+				'async' => null
+			]
 		]
 	]
 ];
+
+// Inside Blade template : 
+{!! MDAsset::addCss([
+	[
+		'file' => 'stylesheet', 
+		'attributes' => [
+			'media' => 'print',
+			'title' => 'title'
+		]
+	], 
+	[
+		'file' => 'other-stylesheet', 
+		'attributes' => [
+			'media' => 'screen'
+		]
+	]
+]) !!}
+
+{!! MDAsset::addJs([
+	[
+		'file' => 'script.js', 
+		'attributes' => [
+			'integrity' => 'sha384-rAnDoMkeY', 
+			'crossorigin' => 'anonymous'
+		]
+	], 
+	'other-script' => [
+		'file' => 'other-script.js',
+		'attributes' => [
+			'async' => null
+		]
+	]
+]) !!}
 ```
