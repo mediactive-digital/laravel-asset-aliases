@@ -30,6 +30,19 @@ Add the AssetManager facade to /config/app.php file.
 ],
 ```
 
+
+## Htaccess changes
+
+In order to avoid cache issues, especially with nginx, this package add specific timestamp in the filename of js & css files. `home.js` will be called as `home.{timestamp}.js`. You will need to add the following rule to your `.htaccess` file.
+
+```
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteRule ^(.*)\.[0-9]+\.(css|js)$ /$1.$2 [L]
+</IfModule>
+
+```
+
 ## Usage
 
 You can link either an internal resource or an external URL.
@@ -163,3 +176,4 @@ return [
 	]
 ]) !!}
 ```
+

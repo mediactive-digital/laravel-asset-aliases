@@ -44,7 +44,14 @@ class AssetManager {
                     $fileAlias = $type.'/'.$file;
                     $filePath = public_path().'/'.$fileAlias;
                     $timeStamp = File::exists($filePath) ? File::lastModified($filePath) : false;
-                    $file = asset($fileAlias).($timeStamp ? '?time='.$timeStamp : '');
+                    
+                    // Add timestamp to filename to avoid cache issues
+                    // You will need to edit your .htaccess, see README.md
+					$fileInfo = pathinfo( $fileAlias );
+					if( in_array( $fileInfo['extension'], ['js','css'] ) ){
+						$fileAlias = $fileInfo['dirname']."/".$fileInfo['filename'].".".$timeStamp.".".$fileInfo['extension'];
+					}
+					$file = asset($fileAlias);
                 }
 
                 $attributesArray += isset($values['attributes']) ? (array)$values['attributes'] : [];
